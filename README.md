@@ -97,6 +97,10 @@ Measured on the local Docker setup (three WordPress 7.1 sites, PHP 8.4, one Mari
   integration tests in `wp-env` (upsert without duplicates, image de-duplication, signatures, permissions,
   sanitising, leads, the demo outage and reset).
 
+| The plugin's settings and activity log (secret hidden)   | The lead form block                          |
+| -------------------------------------------------------- | -------------------------------------------- |
+| ![Plugin settings](docs/screenshots/plugin-settings.png) | ![Lead form](docs/screenshots/lead-form.png) |
+
 ### The theme
 
 - A block theme converted from [`design/landing.html`](design/landing.html): `theme.json` holds the palette, type scale
@@ -106,6 +110,8 @@ Measured on the local Docker setup (three WordPress 7.1 sites, PHP 8.4, one Mari
   fonts and copy. Everything can be edited in the Site Editor without code.
 - Templates for the front page, blog, single posts, pages, archives, search, 404 and case studies. System font stacks, so
   there are no web fonts to download.
+
+![The three style variations in the Site Editor](docs/screenshots/theme-site-editor.png)
 
 <details><summary>The whole Alder Physio home page</summary>
 
