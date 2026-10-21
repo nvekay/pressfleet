@@ -8,3 +8,5 @@ allowBuilds:
   esbuild: true
   # Optional native file locking used by @wordpress/env; it falls back without it
   fs-ext-extra-prebuilt: false
+  # Optional native accelerator for BullMQ's msgpack; works without it
+  msgpackr-extract: false
