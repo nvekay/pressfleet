@@ -89,7 +89,7 @@ export function parseDate(value: string | undefined): string | undefined {
 /** HTML is kept as is (the plugin sanitizes it); anything else is treated as Markdown */
 export function toHtml(content: string): string {
   const text = content.trim();
-  return text.startsWith('<') ? text : (marked.parse(text, { async: false })).trim();
+  return text.startsWith('<') ? text : marked.parse(text, { async: false }).trim();
 }
 
 /** Parses a CSV export (a file or a Google Sheet) into post payloads, collecting every problem by row */
