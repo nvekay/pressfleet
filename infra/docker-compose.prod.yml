@@ -1,0 +1,172 @@
+# The public demo on one small VPS: the hub (dashboard and API), three WordPress sites and Caddy in front with
+# HTTPS. Variables come from .env.prod at the repository root (infra/prod/init-env.sh writes it).
+#   infra/prod/up.sh
+name: pressfleet
+
+x-wordpress: &wordpress
+  build:
+    context: ..
+    dockerfile: infra/wordpress/Dockerfile.prod
+  image: pressfleet-wordpress-prod
+  restart: unless-stopped
+  depends_on:
+    mariadb:
+      condition: service_healthy
+  healthcheck:
+    test: ['CMD-SHELL', 'curl -fsS -o /dev/null http://localhost/wp-includes/images/blank.gif || exit 1']
+    interval: 5s
+    timeout: 3s
+    retries: 30
+
+x-wordpress-env: &wordpress-env
+  WORDPRESS_DB_HOST: mariadb
+  WORDPRESS_DB_USER: pressfleet
+  WORDPRESS_DB_PASSWORD: ${MARIADB_PASSWORD:?}
+  # Caddy terminates HTTPS; the official wp-config already trusts its X-Forwarded-Proto header
+  WORDPRESS_CONFIG_EXTRA: |
+    define('WP_ENVIRONMENT_TYPE', 'production');
+    define('DISALLOW_FILE_EDIT', true);
+    // Scheduled events (lead retries) run from the cron service below, not on page views
+    define('DISABLE_WP_CRON', true);
+    // The hub may wipe what it published, for the nightly demo reset
+    define('PRESSFLEET_DEMO', true);
+
+services:
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    ports: ['80:80', '443:443', '443:443/udp']
+    environment:
+      DOMAIN: ${DOMAIN:?}
+    volumes:
+      - ./prod/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [web, api, site1, site2, site3]
+
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_GITHUB_URL: ${GITHUB_URL:-}
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:4000
+      API_INTERNAL_KEY: ${API_INTERNAL_KEY:?}
+    depends_on: [api]
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://pressfleet:${POSTGRES_PASSWORD:?}@postgres:5432/pressfleet
+      REDIS_URL: redis://redis:6379
+      API_INTERNAL_KEY: ${API_INTERNAL_KEY:?}
+      SECRETS_KEY: ${SECRETS_KEY:?}
+      WEB_URL: https://hub.${DOMAIN}
+      # Caddy sends https://hub.<domain>/api/leads here as /leads; the sites sign the public path
+      LEADS_PUBLIC_PATH: /api/leads
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      DEMO_MODE: 'true'
+      # The hub reads the sample from the dashboard inside the network; the sites fetch its covers publicly
+      SAMPLE_CSV_URL: http://web:3000/samples/health-network.csv
+      SAMPLE_ASSETS_URL: https://hub.${DOMAIN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  mariadb:
+    image: mariadb:11.8
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?}
+      MARIADB_USER: pressfleet
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:?}
+    volumes:
+      - mariadb:/var/lib/mysql
+      - ./mariadb-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # WordPress itself is copied fresh from the image on every deploy (up.sh renews the anonymous volumes);
+  # uploads and the databases persist
+  site1:
+    <<: *wordpress
+    environment:
+      <<: *wordpress-env
+      WORDPRESS_DB_NAME: site1
+    volumes:
+      - uploads1:/var/www/html/wp-content/uploads
+
+  site2:
+    <<: *wordpress
+    environment:
+      <<: *wordpress-env
+      WORDPRESS_DB_NAME: site2
+    volumes:
+      - uploads2:/var/www/html/wp-content/uploads
+
+  site3:
+    <<: *wordpress
+    environment:
+      <<: *wordpress-env
+      WORDPRESS_DB_NAME: site3
+    volumes:
+      - uploads3:/var/www/html/wp-content/uploads
+
+  # Runs WordPress's scheduled events on every site twice a minute
+  cron:
+    image: curlimages/curl:8.21.0
+    restart: unless-stopped
+    depends_on: [site1, site2, site3]
+    entrypoint:
+      - sh
+      - -c
+      - while true; do for s in site1 site2 site3; do curl -fsS -o /dev/null "http://$$s/wp-cron.php?doing_wp_cron" || true; done; sleep 30; done
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pressfleet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: pressfleet
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U pressfleet']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    # BullMQ keeps its queues here; append-only so jobs survive a restart
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  caddy-data:
+  caddy-config:
+  mariadb:
+  uploads1:
+  uploads2:
+  uploads3:
+  postgres:
+  redis:

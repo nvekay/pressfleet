@@ -4,12 +4,13 @@ import { lt } from 'drizzle-orm';
 import { Redis } from 'ioredis';
 import { env } from '../config/env.js';
 import { type Db, InjectDb } from '../db/db.module.js';
+import { CampaignsService } from '../campaigns/campaigns.service.js';
 import { campaigns, leads } from '../db/schema.js';
 import { SitesService } from '../sites/sites.service.js';
 
 /**
- * The nightly reset of the public demo: every site deletes what the hub published there and the campaigns go, so
- * the first run of the day shows posts being created rather than "unchanged". Leads are kept for a week.
+ * The nightly reset of the public demo: every site deletes what the hub published there, the campaigns go, and the
+ * sample is published again so the sites never stand empty. Leads are kept for a week.
  */
 @Injectable()
 export class DemoService implements OnApplicationBootstrap, OnApplicationShutdown {
@@ -21,6 +22,7 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
   constructor(
     @InjectDb() private readonly db: Db,
     private readonly sites: SitesService,
+    private readonly campaigns: CampaignsService,
   ) {}
 
   async onApplicationBootstrap() {
@@ -53,6 +55,8 @@ export class DemoService implements OnApplicationBootstrap, OnApplicationShutdow
     await this.db.delete(leads).where(lt(leads.receivedAt, new Date(Date.now() - 7 * 24 * 3600_000)));
     const done = results.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
     this.logger.log(`Demo reset: ${JSON.stringify(done)}`);
+    const siteIds = (await this.sites.list()).map((s) => s.id);
+    if (siteIds.length) await this.campaigns.create({ source: 'sample', name: 'Nightly refresh', siteIds });
     return done;
   }
 }

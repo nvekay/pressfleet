@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+**/.next
+**/build
+**/vendor
+**/*.tsbuildinfo
+.env
+.env.*
+.git
+.claude
+infra/.sites.json
+design

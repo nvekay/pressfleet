@@ -1,0 +1,43 @@
+# HTTPS for the hub and the three demo sites. DOMAIN is your domain with DNS records for hub, alder, birch and
+# cedar, or <server-ip-with-dashes>.sslip.io, which needs no DNS at all.
+(common) {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}
+
+hub.{$DOMAIN} {
+	import common
+	# Leads from the sites' form block; everything else under /api is the dashboard's own routes
+	handle /api/leads {
+		rewrite * /leads
+		reverse_proxy api:4000
+	}
+	handle {
+		# Live campaign events must not wait for a compression buffer
+		@compressible not path /api/campaigns/*/events
+		encode @compressible zstd gzip
+		reverse_proxy web:3000
+	}
+}
+
+alder.{$DOMAIN} {
+	import common
+	encode zstd gzip
+	reverse_proxy site1:80
+}
+
+birch.{$DOMAIN} {
+	import common
+	encode zstd gzip
+	reverse_proxy site2:80
+}
+
+cedar.{$DOMAIN} {
+	import common
+	encode zstd gzip
+	reverse_proxy site3:80
+}

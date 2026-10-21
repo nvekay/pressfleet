@@ -68,7 +68,7 @@ export class SitesService {
           : err instanceof WpError && err.status === 401
             ? ' Check the username, the Application Password and the secret.'
             : '';
-      throw new ConflictException(`Could not connect: ${(err as Error).message}.${hint}`);
+      throw new ConflictException(`Could not connect: ${(err as Error).message.replace(/\.$/, '')}.${hint}`);
     }
 
     const name = input.name?.trim() || health.site;
