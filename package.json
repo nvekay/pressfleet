@@ -11,10 +11,10 @@
   "scripts": {
     "dev:wp": "docker compose -f infra/docker-compose.yml up -d --build --wait && bash infra/provision.sh",
     "down:wp": "docker compose -f infra/docker-compose.yml down",
-    "build": "pnpm -r build",
+    "build": "pnpm -r --if-present build",
     "lint": "eslint .",
-    "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "php": "node scripts/php.mjs"
