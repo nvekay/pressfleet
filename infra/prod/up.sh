@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Builds and starts the public demo on this server, then provisions the sites and registers them with the hub.
+# Starts the public demo on this server, then provisions the sites and registers them with the hub.
 # Run from the repository root after infra/prod/init-env.sh has written .env.prod:
-#   infra/prod/up.sh
+#   infra/prod/up.sh              builds the images here
+#   infra/prod/up.sh --no-build   uses images already loaded (infra/prod/deploy.sh builds them on your machine)
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -10,9 +11,11 @@ if [ ! -f .env.prod ]; then
   exit 1
 fi
 compose() { docker compose -f infra/docker-compose.prod.yml --env-file .env.prod "$@"; }
+build=--build
+[ "${1:-}" = --no-build ] && build=--no-build
 
 # Fresh anonymous volumes give every site the WordPress, plugin and theme from the new image
-compose up -d --build --renew-anon-volumes --remove-orphans --wait
+compose up -d "$build" --renew-anon-volumes --remove-orphans --wait
 PROD=1 bash infra/provision.sh
 docker image prune -f >/dev/null
 

@@ -1,6 +1,7 @@
 # The public demo on one small VPS: the hub (dashboard and API), three WordPress sites and Caddy in front with
 # HTTPS. Variables come from .env.prod at the repository root (infra/prod/init-env.sh writes it).
 #   infra/prod/up.sh
+# Memory settings are sized for a server with 1-2 GB of RAM (plus swap).
 name: pressfleet
 
 x-wordpress: &wordpress
@@ -50,8 +51,10 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         NEXT_PUBLIC_GITHUB_URL: ${GITHUB_URL:-}
+    image: pressfleet-web
     restart: unless-stopped
     environment:
+      NODE_OPTIONS: --max-old-space-size=192
       API_URL: http://api:4000
       API_INTERNAL_KEY: ${API_INTERNAL_KEY:?}
     depends_on: [api]
@@ -60,8 +63,10 @@ services:
     build:
       context: ..
       dockerfile: apps/api/Dockerfile
+    image: pressfleet-api
     restart: unless-stopped
     environment:
+      NODE_OPTIONS: --max-old-space-size=192
       DATABASE_URL: postgres://pressfleet:${POSTGRES_PASSWORD:?}@postgres:5432/pressfleet
       REDIS_URL: redis://redis:6379
       API_INTERNAL_KEY: ${API_INTERNAL_KEY:?}
@@ -84,6 +89,7 @@ services:
   mariadb:
     image: mariadb:11.8
     restart: unless-stopped
+    command: ['--innodb-buffer-pool-size=64M', '--performance-schema=OFF', '--max-connections=50']
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?}
       MARIADB_USER: pressfleet
@@ -136,6 +142,7 @@ services:
   postgres:
     image: postgres:17-alpine
     restart: unless-stopped
+    command: ['postgres', '-c', 'shared_buffers=32MB', '-c', 'max_connections=30']
     environment:
       POSTGRES_USER: pressfleet
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}

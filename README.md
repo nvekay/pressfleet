@@ -132,19 +132,20 @@ CI runs all of them on every push.
 
 ## Deploy
 
-One small VPS (2 vCPU, 4 GB) runs everything: Caddy with automatic HTTPS, the dashboard, the API, Postgres, Redis,
-MariaDB and three WordPress containers with the plugin and theme built into the image. Without a domain, `sslip.io`
-gives the server's IP a hostname, so no DNS setup is needed.
+One small VPS runs everything: Caddy with automatic HTTPS, the dashboard, the API, Postgres, Redis, MariaDB and three
+WordPress containers with the plugin and theme built into the image. The memory settings fit a 1 GB server with swap.
+Without a domain, `sslip.io` gives the server's IP a hostname, so no DNS setup is needed.
 
 ```bash
-ssh root@<ip> 'bash -s' < infra/prod/setup-server.sh            # Docker, firewall, swap
-infra/prod/deploy.sh root@<ip>                                   # ships the code
+ssh root@<ip> 'bash -s' < infra/prod/setup-server.sh                  # Docker, firewall, swap
+infra/prod/deploy.sh root@<ip>                                         # builds the images here, ships code and images
 ssh root@<ip> 'bash /opt/pressfleet/infra/prod/init-env.sh <ip-with-dashes>.sslip.io'
-infra/prod/deploy.sh root@<ip>                                   # builds, starts and provisions
+ssh root@<ip> 'bash /opt/pressfleet/infra/prod/up.sh --no-build'       # starts, provisions and registers the sites
 ```
 
-The hub is then at `https://hub.<domain>` and the sites at `https://alder.<domain>`, `birch.` and `cedar.`. Set
-`TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in `/opt/pressfleet/.env.prod` to get leads in Telegram.
+Later deploys are `infra/prod/deploy.sh root@<ip>` alone. The hub is at `https://hub.<domain>` and the sites at
+`https://alder.<domain>`, `birch.` and `cedar.`. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in
+`/opt/pressfleet/.env.prod` to get leads in Telegram.
 
 ## Demo data
 
