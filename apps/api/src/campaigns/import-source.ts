@@ -1,7 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { type ImportResult, parseImport, sheetCsvUrl } from '@pressfleet/shared';
+import { env } from '../config/env.js';
 
-export type ImportSource = { source: 'csv'; csv: string } | { source: 'sheet'; url: string };
+export type ImportSource = { source: 'csv'; csv: string } | { source: 'sheet'; url: string } | { source: 'sample' };
 
 const MAX_BYTES = 2 * 1024 * 1024;
 
@@ -23,7 +24,17 @@ async function fetchSheet(link: string): Promise<string> {
   return text;
 }
 
+/** The demo dataset, with its image placeholders pointed at the dashboard the sites can reach */
+async function fetchSample(): Promise<string> {
+  const e = env();
+  const url = e.SAMPLE_CSV_URL ?? `${e.WEB_URL}/samples/health-network.csv`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(15_000) }).catch(() => null);
+  if (!res?.ok) throw new BadRequestException('The sample dataset is not available');
+  return (await res.text()).replaceAll('{{ASSETS}}', e.SAMPLE_ASSETS_URL ?? e.WEB_URL);
+}
+
 export async function readImport(input: ImportSource): Promise<ImportResult & { sourceRef: string | null }> {
+  if (input.source === 'sample') return { ...parseImport(await fetchSample()), sourceRef: 'health-network.csv' };
   if (input.source === 'csv') {
     if (input.csv.length > MAX_BYTES) throw new BadRequestException('The file is larger than 2 MB');
     return { ...parseImport(input.csv), sourceRef: null };

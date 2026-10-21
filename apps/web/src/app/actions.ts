@@ -59,6 +59,16 @@ export async function startCampaign(input: ImportSource & { name: string; siteId
   redirect(`/campaigns/${id}`);
 }
 
+/** Demo: the site answers 503 to publishing for this many seconds */
+export async function simulateOutage(siteId: string, seconds: number): Promise<FormState> {
+  try {
+    await api.outage(siteId, seconds);
+    return {};
+  } catch (err) {
+    return { error: message(err) };
+  }
+}
+
 export async function retryFailed(id: string): Promise<void> {
   await api.retryFailed(id);
 }

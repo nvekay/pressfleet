@@ -106,6 +106,16 @@ final class Log {
 	}
 
 	/**
+	 * Deletes every entry (the demo's nightly reset).
+	 */
+	public static function clear(): void {
+		global $wpdb;
+		$table = self::table();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- custom table name
+		$wpdb->query( "TRUNCATE TABLE {$table}" );
+	}
+
+	/**
 	 * Deletes old entries, at most once an hour.
 	 */
 	private static function prune(): void {

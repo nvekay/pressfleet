@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: 'New campaign' };
 export const dynamic = 'force-dynamic';
 
 export default async function NewCampaign() {
-  const sites = await api.sites();
+  const [sites, config] = await Promise.all([api.sites(), api.config()]);
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <h1 className="text-2xl font-semibold">New campaign</h1>
@@ -16,7 +16,10 @@ export default async function NewCampaign() {
         <code>seo_description</code>, <code>publish_at</code> and <code>sites</code> are optional. Importing the same
         rows again updates the posts instead of duplicating them.
       </p>
-      <NewCampaignForm sites={sites.map((s) => ({ id: s.id, name: s.name, ok: s.healthStatus !== 'error' }))} />
+      <NewCampaignForm
+        demo={config.demo}
+        sites={sites.map((s) => ({ id: s.id, name: s.name, ok: s.healthStatus !== 'error' }))}
+      />
     </div>
   );
 }

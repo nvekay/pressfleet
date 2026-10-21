@@ -30,6 +30,16 @@ const schema = z.object({
   // New leads are posted to this Telegram chat when both are set
   TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_CHAT_ID: z.string().optional(),
+  // Public demo: only the sample dataset, no site changes, a few campaigns an hour, a nightly reset
+  DEMO_MODE: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+  DEMO_CAMPAIGNS_PER_HOUR: z.coerce.number().int().positive().default(10),
+  DEMO_RESET_CRON: z.string().default('0 3 * * *'),
+  // The sample dataset and the public URL its {{ASSETS}} placeholders point to (the sites download covers from it)
+  SAMPLE_CSV_URL: z.url().optional(),
+  SAMPLE_ASSETS_URL: z.url().optional(),
 });
 
 export type Env = z.infer<typeof schema>;

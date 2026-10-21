@@ -17,7 +17,13 @@ const TABS: { id: Tab; label: string; icon: typeof FileText }[] = [
   { id: 'sheet', label: 'Google Sheet', icon: FileSpreadsheet },
 ];
 
-export function NewCampaignForm({ sites }: { sites: { id: string; name: string; ok: boolean }[] }) {
+export function NewCampaignForm({
+  sites,
+  demo,
+}: {
+  sites: { id: string; name: string; ok: boolean }[];
+  demo: boolean;
+}) {
   const [tab, setTab] = useState<Tab>('sample');
   const [csv, setCsv] = useState<string | null>(null);
   const [sheetUrl, setSheetUrl] = useState('');
@@ -35,10 +41,8 @@ export function NewCampaignForm({ sites }: { sites: { id: string; name: string; 
   async function source(): Promise<ImportSource | null> {
     if (tab === 'sheet') return sheetUrl ? { source: 'sheet', url: sheetUrl } : null;
     if (tab === 'csv') return csv ? { source: 'csv', csv } : null;
-    const res = await fetch(SAMPLE.file);
-    // The sample points its images at {{ASSETS}}: this dashboard, as the WordPress sites can reach it
-    const assets = process.env.NEXT_PUBLIC_SAMPLE_ASSETS_URL || window.location.origin;
-    return { source: 'csv', csv: (await res.text()).replaceAll('{{ASSETS}}', assets) };
+    // The hub reads the sample itself and points its images at this dashboard
+    return { source: 'sample' };
   }
 
   const runPreview = () =>
@@ -66,6 +70,8 @@ export function NewCampaignForm({ sites }: { sites: { id: string; name: string; 
             <button
               key={t.id}
               type="button"
+              disabled={demo && t.id !== 'sample'}
+              title={demo && t.id !== 'sample' ? 'Run PressFleet locally to import your own posts' : undefined}
               onClick={() => {
                 setTab(t.id);
                 setName(t.id === 'sample' ? SAMPLE.name : '');
@@ -73,13 +79,19 @@ export function NewCampaignForm({ sites }: { sites: { id: string; name: string; 
               }}
               className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
                 tab === t.id ? 'border-accent bg-accent-soft text-accent-strong' : 'border-ink-200 hover:bg-ink-50'
-              }`}
+              } disabled:cursor-not-allowed disabled:opacity-50`}
             >
               <t.icon className="size-4" /> {t.label}
             </button>
           ))}
         </div>
 
+        {demo && (
+          <p className="mt-3 text-xs text-ink-500">
+            The public demo publishes this sample only, so nobody can post their own text to the live sites. Run
+            PressFleet locally (see the README) to import a CSV file or a Google Sheet.
+          </p>
+        )}
         <div className="mt-4 rounded-xl border border-ink-200 p-4 text-sm">
           {tab === 'sample' && (
             <p className="text-ink-600">

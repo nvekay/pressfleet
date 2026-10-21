@@ -1,6 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { CampaignStatus, DeliveryStatus, ImportRow } from '@pressfleet/shared';
-import { and, asc, count, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, inArray, isNull } from 'drizzle-orm';
+import { env } from '../config/env.js';
 import { newId } from '../common/ids.js';
 import { type Db, InjectDb } from '../db/db.module.js';
 import { type Campaign, campaigns, deliveries, items, type Site, sites } from '../db/schema.js';
@@ -45,6 +52,7 @@ export class CampaignsService {
 
   /** Creates the campaign, one delivery per row and site, and queues them all */
   async create(input: ImportSource & { name: string; siteIds: string[] }): Promise<Campaign> {
+    await this.checkDemoLimits(input);
     const result = await readImport(input);
     if (!result.rows.length) {
       throw new BadRequestException(result.problems[0]?.message ?? 'The import has no rows to publish');
@@ -82,6 +90,30 @@ export class CampaignsService {
       .where(eq(deliveries.campaignId, campaign.id));
     for (const d of queued) await this.queues.enqueue(d);
     return campaign;
+  }
+
+  /**
+   * The public demo publishes only its own dataset (visitors' text never reaches the live sites), one campaign at a
+   * time and a few an hour.
+   */
+  private async checkDemoLimits(input: ImportSource): Promise<void> {
+    const e = env();
+    if (!e.DEMO_MODE) return;
+    if (input.source !== 'sample') {
+      throw new ForbiddenException(
+        'The public demo publishes the sample dataset only. Run PressFleet locally to import your own.',
+      );
+    }
+    const [running] = await this.db.select({ n: count() }).from(campaigns).where(eq(campaigns.status, 'running'));
+    if (running!.n > 0)
+      throw new ConflictException('A campaign is publishing right now. Watch it, or try again in a minute.');
+    const [recent] = await this.db
+      .select({ n: count() })
+      .from(campaigns)
+      .where(gt(campaigns.createdAt, new Date(Date.now() - 3600_000)));
+    if (recent!.n >= e.DEMO_CAMPAIGNS_PER_HOUR) {
+      throw new ConflictException('The demo has run enough campaigns this hour. Please come back a little later.');
+    }
   }
 
   async list() {

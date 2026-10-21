@@ -23,6 +23,8 @@ final class Plugin {
 		add_action( 'init', array( Case_Post_Type::class, 'register' ) );
 		add_action( 'rest_api_init', array( new Rest_Controller( new Publisher( new Media(), new Seo() ) ), 'register_routes' ) );
 		add_action( 'rest_api_init', array( new Leads_Controller(), 'register_routes' ) );
+		add_action( 'rest_api_init', array( new Demo_Controller(), 'register_routes' ) );
+		add_filter( 'rest_pre_dispatch', array( Demo_Controller::class, 'block_during_outage' ), 10, 3 );
 		add_action( Lead_Sender::HOOK, array( Lead_Sender::class, 'run' ) );
 		add_action( 'init', array( self::class, 'register_blocks' ) );
 		Seo::register_output();

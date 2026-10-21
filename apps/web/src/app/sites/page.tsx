@@ -5,12 +5,13 @@ import { api } from '@/lib/api';
 import { ago } from '@/lib/format';
 import { checkSite } from '../actions';
 import { AddSiteForm } from './add-site-form';
+import { OutageButton } from '@/components/outage-button';
 
 export const metadata: Metadata = { title: 'Sites' };
 export const dynamic = 'force-dynamic';
 
 export default async function Sites() {
-  const sites = await api.sites();
+  const [sites, config] = await Promise.all([api.sites(), api.config()]);
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <h1 className="text-2xl font-semibold">Sites</h1>
@@ -49,8 +50,9 @@ export default async function Sites() {
                 <td className="px-4 py-3 text-right tabular-nums">{s.health?.posts_from_hub ?? '—'}</td>
                 <td className="px-4 py-3 text-ink-600">{s.health ? (s.health.seo_plugin ?? 'plugin') : '—'}</td>
                 <td className="px-4 py-3 text-ink-500">{ago(s.checkedAt)}</td>
-                <td className="px-4 py-3 text-right">
-                  <form action={checkSite.bind(null, s.id)}>
+                <td className="px-4 py-3 text-right whitespace-nowrap">
+                  <OutageButton siteId={s.id} siteName={s.name} compact />
+                  <form action={checkSite.bind(null, s.id)} className="inline">
                     <button
                       type="submit"
                       className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-ink-600 hover:bg-ink-100"
@@ -72,7 +74,13 @@ export default async function Sites() {
         </table>
       </div>
 
-      <AddSiteForm />
+      {config.demo ? (
+        <p className="mt-8 rounded-xl border border-dashed border-ink-300 p-5 text-sm text-ink-600">
+          Adding sites is turned off in the public demo. Run PressFleet locally to connect your own WordPress sites.
+        </p>
+      ) : (
+        <AddSiteForm />
+      )}
     </div>
   );
 }

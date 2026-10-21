@@ -42,6 +42,16 @@ export class WpClient {
     return this.call<PublishResult>('POST', '/pressfleet/v1/posts', payload);
   }
 
+  /** Demo: the site answers 503 to publishing for this long (0 ends it) */
+  outage(seconds: number): Promise<{ offline_until: string | null }> {
+    return this.call('POST', '/pressfleet/v1/outage', { seconds });
+  }
+
+  /** Demo: deletes everything the hub published on the site */
+  reset(): Promise<{ posts: number; images: number }> {
+    return this.call('POST', '/pressfleet/v1/reset', {});
+  }
+
   private async call<T>(method: 'GET' | 'POST', route: string, body?: unknown): Promise<T> {
     const raw = body === undefined ? '' : JSON.stringify(body);
     const timestamp = this.now();

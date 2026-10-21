@@ -4,6 +4,7 @@ import { DELIVERY_STATUSES, type DeliveryStatus } from '@pressfleet/shared';
 import { ArrowLeft, Check, ExternalLink, Equal, RefreshCw, RotateCcw, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState, useTransition } from 'react';
+import { OutageButton } from '@/components/outage-button';
 import { CampaignBadge, DELIVERY_STYLE } from '@/components/status';
 import { Button } from '@/components/ui/button';
 import { dateTime, duration } from '@/lib/format';
@@ -27,9 +28,6 @@ export function LiveCampaign({ initial }: { initial: CampaignDetail }) {
       const d = JSON.parse((e as MessageEvent<string>).data) as Delivery;
       setCells((prev) => new Map(prev).set(d.id, d));
     });
-    source.addEventListener('campaign', (e) => {
-      setCampaign((prev) => ({ ...prev, ...(JSON.parse((e as MessageEvent<string>).data) as Campaign) }));
-    });
     const resync = async () => {
       const res = await fetch(`/api/campaigns/${id}`, { cache: 'no-store' }).catch(() => null);
       if (!res?.ok) return;
@@ -37,6 +35,14 @@ export function LiveCampaign({ initial }: { initial: CampaignDetail }) {
       setCampaign(fresh.campaign);
       setCells(new Map(fresh.deliveries.map((d) => [d.id, d])));
     };
+    source.addEventListener('campaign', (e) => {
+      const update = JSON.parse((e as MessageEvent<string>).data) as Campaign;
+      setCampaign((prev) => ({ ...prev, ...update }));
+      // Deliveries that finished just before the stream opened have no events of their own
+      if (update.status && update.status !== 'running') void resync();
+    });
+    // Catches up on what happened between rendering the page and opening the stream
+    source.onopen = () => void resync();
     source.onerror = () => void resync();
     const timer = setInterval(() => void resync(), 15_000);
     return () => {
@@ -117,6 +123,31 @@ export function LiveCampaign({ initial }: { initial: CampaignDetail }) {
         <Button className="mt-4" onClick={() => startRetry(() => retryFailed(campaign.id))} loading={retrying}>
           <RotateCcw className="size-4" /> Retry {counts.failed} failed
         </Button>
+      )}
+
+      {sites.length > 0 && (
+        <section className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">
+          <div className="font-medium text-amber-900">Try breaking it</div>
+          <p className="mt-1 text-amber-900/80">
+            {running ? (
+              'Take a site offline for a minute while the campaign runs: its posts wait and retry, the other sites keep going, and nothing is published twice.'
+            ) : (
+              <>
+                Take a site offline for a minute, then{' '}
+                <Link href="/campaigns/new" className="font-medium underline underline-offset-2">
+                  publish the sample again
+                </Link>
+                : that site&apos;s posts wait and retry until it is back, the other sites finish at once, and nothing is
+                published twice.
+              </>
+            )}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {sites.map((s) => (
+              <OutageButton key={s.id} siteId={s.id} siteName={s.name} />
+            ))}
+          </div>
+        </section>
       )}
 
       <section className="mt-8 overflow-x-auto rounded-xl border border-ink-200">

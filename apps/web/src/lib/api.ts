@@ -11,7 +11,7 @@ export class ApiError extends Error {
   }
 }
 
-export type ImportSource = { source: 'csv'; csv: string } | { source: 'sheet'; url: string };
+export type ImportSource = { source: 'csv'; csv: string } | { source: 'sheet'; url: string } | { source: 'sample' };
 
 async function call<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
   const { API_URL, API_INTERNAL_KEY } = env();
@@ -44,4 +44,7 @@ export const api = {
     call<{ id: string }>('/campaigns', { method: 'POST', body: input }),
   retryFailed: (id: string) => call<{ queued: number }>(`/campaigns/${id}/retry-failed`, { method: 'POST' }),
   leads: () => call<Lead[]>('/leads'),
+  config: () => call<{ demo: boolean; resetCron: string | null }>('/config'),
+  outage: (id: string, seconds: number) =>
+    call<{ offline_until: string | null }>(`/sites/${id}/outage`, { method: 'POST', body: { seconds } }),
 };

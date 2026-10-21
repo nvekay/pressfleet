@@ -8,6 +8,7 @@ import { CampaignsService } from './campaigns.service.js';
 const source = z.discriminatedUnion('source', [
   z.object({ source: z.literal('csv'), csv: z.string().min(1) }),
   z.object({ source: z.literal('sheet'), url: z.url() }),
+  z.object({ source: z.literal('sample') }),
 ]);
 
 const create = z.intersection(
