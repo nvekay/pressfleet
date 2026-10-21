@@ -4,7 +4,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
-const plugin = resolve(import.meta.dirname, '..', 'wp', 'plugins', 'pressfleet-connector');
+const wp = resolve(import.meta.dirname, '..', 'wp');
 const args = process.argv.slice(2);
 if (!args.length) {
   console.error('Usage: pnpm php <command> [args]   e.g. pnpm php composer lint');
@@ -17,11 +17,12 @@ const result = spawnSync(
     'run',
     '--rm',
     '-v',
-    `${plugin}:/app`,
+    // The whole wp/ folder, so the plugin's tooling can also check the theme
+    `${wp}:/wp`,
     '-w',
-    '/app',
+    '/wp/plugins/pressfleet-connector',
     '-e',
-    'COMPOSER_CACHE_DIR=/app/vendor/.cache',
+    'COMPOSER_CACHE_DIR=/wp/plugins/pressfleet-connector/vendor/.cache',
     'composer:2',
     ...args,
   ],

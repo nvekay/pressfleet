@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.wp.org/wp/6.8/theme.json",
+  "version": 3,
+  "title": "Cedar (violet, serif headings)",
+  "settings": {
+    "color": {
+      "palette": [
+        { "slug": "base", "name": "Base", "color": "#ffffff" },
+        { "slug": "surface", "name": "Surface", "color": "#faf8fd" },
+        { "slug": "line", "name": "Line", "color": "#e9e4f2" },
+        { "slug": "muted", "name": "Muted", "color": "#655d74" },
+        { "slug": "contrast", "name": "Contrast", "color": "#1d1529" },
+        { "slug": "brand", "name": "Brand", "color": "#7c3aed" },
+        { "slug": "brand-strong", "name": "Brand strong", "color": "#4c1d95" },
+        { "slug": "brand-soft", "name": "Brand soft", "color": "#f5f3ff" }
+      ]
+    }
+  },
+  "styles": {
+    "elements": {
+      "heading": {
+        "typography": { "fontFamily": "var:preset|font-family|serif", "fontWeight": "600", "letterSpacing": "-0.01em" }
+      }
+    }
+  }
+}

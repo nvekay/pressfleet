@@ -1,0 +1,63 @@
+/*
+ * Decorations theme.json cannot express. Everything else (colors, type, spacing, buttons) is in theme.json.
+ */
+
+/* Soft circles on the hero card, as in the design */
+.pressfleet-hero-card {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+}
+
+.pressfleet-hero-card::before,
+.pressfleet-hero-card::after {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	border-radius: 50%;
+	background: rgb(255 255 255 / 8%);
+}
+
+.pressfleet-hero-card::before {
+	width: 340px;
+	height: 340px;
+	top: -90px;
+	right: -110px;
+}
+
+.pressfleet-hero-card::after {
+	width: 220px;
+	height: 220px;
+	bottom: 120px;
+	left: -80px;
+}
+
+/* The stats bar overlaps the hero */
+.pressfleet-stats {
+	position: relative;
+	margin-top: calc(-1 * var(--wp--preset--spacing--50)) !important;
+}
+
+/* Cards of a query loop stretch to the same height */
+.pressfleet-cards .wp-block-post {
+	display: flex;
+}
+
+.pressfleet-cards .wp-block-post > .wp-block-group {
+	flex: 1;
+}
+
+/* Images in cards keep the card's corners */
+.is-style-card .wp-block-post-featured-image img {
+	border-radius: var(--wp--custom--radius--card) var(--wp--custom--radius--card) 0 0;
+}
+
+.wp-block-details summary {
+	font-weight: 600;
+	cursor: pointer;
+}
+
+/* Card corners clip images and backgrounds inside */
+.is-style-card {
+	overflow: hidden;
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.wp.org/wp/6.8/theme.json",
+  "version": 3,
+  "title": "Alder (green)",
+  "settings": {
+    "color": {
+      "palette": [
+        { "slug": "base", "name": "Base", "color": "#ffffff" },
+        { "slug": "surface", "name": "Surface", "color": "#f7faf8" },
+        { "slug": "line", "name": "Line", "color": "#e3e9e5" },
+        { "slug": "muted", "name": "Muted", "color": "#5b6b62" },
+        { "slug": "contrast", "name": "Contrast", "color": "#14201a" },
+        { "slug": "brand", "name": "Brand", "color": "#15803d" },
+        { "slug": "brand-strong", "name": "Brand strong", "color": "#14532d" },
+        { "slug": "brand-soft", "name": "Brand soft", "color": "#f0fdf4" }
+      ]
+    }
+  }
+}

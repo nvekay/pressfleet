@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.wp.org/wp/6.8/theme.json",
+  "version": 3,
+  "title": "Birch (blue)",
+  "settings": {
+    "color": {
+      "palette": [
+        { "slug": "base", "name": "Base", "color": "#ffffff" },
+        { "slug": "surface", "name": "Surface", "color": "#f6f9fc" },
+        { "slug": "line", "name": "Line", "color": "#e1e8ef" },
+        { "slug": "muted", "name": "Muted", "color": "#566577" },
+        { "slug": "contrast", "name": "Contrast", "color": "#0f1b2a" },
+        { "slug": "brand", "name": "Brand", "color": "#0369a1" },
+        { "slug": "brand-strong", "name": "Brand strong", "color": "#0c4a6e" },
+        { "slug": "brand-soft", "name": "Brand soft", "color": "#f0f9ff" }
+      ]
+    }
+  },
+  "styles": {
+    "elements": {
+      "heading": { "typography": { "letterSpacing": "-0.03em" } }
+    }
+  }
+}

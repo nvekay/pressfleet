@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alder Physio: physiotherapy in Lisbon</title>
+    <!--
+      The static design the PressFleet block theme is built from (wp/themes/pressfleet-theme).
+      One file, no framework: system fonts, CSS custom properties for the brand, no JavaScript.
+    -->
+    <style>
+      :root {
+        --brand: #15803d;
+        --brand-strong: #14532d;
+        --brand-soft: #f0fdf4;
+        --ink: #14201a;
+        --muted: #5b6b62;
+        --line: #e3e9e5;
+        --surface: #f7faf8;
+        --radius: 14px;
+        --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font);
+        color: var(--ink);
+        line-height: 1.6;
+        background: #fff;
+      }
+      a {
+        color: var(--brand);
+      }
+      h1,
+      h2,
+      h3 {
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .eyebrow {
+        color: var(--brand);
+        font-weight: 600;
+        font-size: 0.875rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .btn {
+        display: inline-block;
+        padding: 0.8rem 1.4rem;
+        border-radius: 999px;
+        font-weight: 600;
+        text-decoration: none;
+        background: var(--brand);
+        color: #fff;
+      }
+      .btn:hover {
+        background: var(--brand-strong);
+      }
+      .btn.outline {
+        background: transparent;
+        color: var(--ink);
+        box-shadow: inset 0 0 0 1.5px var(--line);
+      }
+      section {
+        padding: 88px 0;
+      }
+      .section-head {
+        max-width: 640px;
+        margin-bottom: 40px;
+      }
+      .section-head h2 {
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        margin-top: 8px;
+      }
+      .section-head p {
+        color: var(--muted);
+      }
+
+      /* Header */
+      header {
+        border-bottom: 1px solid var(--line);
+      }
+      header .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 72px;
+        gap: 24px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .logo span {
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+      }
+      nav ul {
+        display: flex;
+        gap: 28px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      nav a {
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      /* Hero */
+      .hero {
+        padding: 72px 0 96px;
+        background: radial-gradient(circle at 85% 10%, var(--brand-soft), transparent 55%);
+      }
+      .hero .wrap {
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 56px;
+        align-items: center;
+      }
+      .hero h1 {
+        font-size: clamp(2.4rem, 5vw, 3.8rem);
+        margin: 12px 0 20px;
+      }
+      .hero p.lead {
+        font-size: 1.2rem;
+        color: var(--muted);
+        max-width: 34rem;
+      }
+      .hero .actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 28px;
+        flex-wrap: wrap;
+      }
+      .hero-card {
+        aspect-ratio: 4 / 4.4;
+        border-radius: 28px;
+        background: linear-gradient(150deg, var(--brand) 0%, var(--brand-strong) 100%);
+        position: relative;
+        overflow: hidden;
+        color: #fff;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+      .hero-card::before,
+      .hero-card::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .hero-card::before {
+        width: 340px;
+        height: 340px;
+        top: -90px;
+        right: -110px;
+      }
+      .hero-card::after {
+        width: 220px;
+        height: 220px;
+        bottom: 120px;
+        left: -80px;
+      }
+      .hero-card strong {
+        font-size: 3rem;
+        line-height: 1;
+      }
+
+      /* Stats */
+      .stats {
+        padding: 0;
+      }
+      .stats .wrap {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 28px;
+        background: #fff;
+        margin-top: -48px;
+        position: relative;
+      }
+      .stats strong {
+        display: block;
+        font-size: 1.9rem;
+      }
+      .stats span {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      /* Services */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      .card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 28px;
+        background: #fff;
+      }
+      .card .icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--brand-soft);
+        color: var(--brand);
+        display: grid;
+        place-items: center;
+        margin-bottom: 18px;
+      }
+      .card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+      }
+      .card p {
+        color: var(--muted);
+        margin: 0;
+      }
+
+      /* Cases and journal */
+      .muted-bg {
+        background: var(--surface);
+      }
+      .case,
+      .post {
+        background: #fff;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+      .case .cover,
+      .post .cover {
+        aspect-ratio: 16 / 9;
+        background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+      }
+      .case div:last-child,
+      .post div:last-child {
+        padding: 22px;
+      }
+      .case h3,
+      .post h3 {
+        font-size: 1.1rem;
+        margin-bottom: 6px;
+      }
+      .case p,
+      .post p {
+        color: var(--muted);
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      /* Testimonials */
+      .quotes {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+      }
+      blockquote {
+        margin: 0;
+        padding: 32px;
+        border-radius: var(--radius);
+        background: var(--brand-soft);
+        font-size: 1.15rem;
+      }
+      blockquote cite {
+        display: block;
+        margin-top: 16px;
+        font-size: 0.95rem;
+        font-style: normal;
+        color: var(--muted);
+      }
+
+      /* FAQ */
+      details {
+        border-bottom: 1px solid var(--line);
+        padding: 18px 0;
+      }
+      summary {
+        font-weight: 600;
+        cursor: pointer;
+      }
+      details p {
+        color: var(--muted);
+        margin-bottom: 0;
+      }
+
+      /* Contact */
+      .contact .wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 56px;
+        background: var(--ink);
+        color: #fff;
+        border-radius: 28px;
+        padding: 56px;
+      }
+      .contact h2 {
+        font-size: 2.2rem;
+      }
+      .contact p {
+        color: #c7d2cc;
+      }
+      form {
+        display: grid;
+        gap: 12px;
+      }
+      input,
+      textarea {
+        font: inherit;
+        padding: 0.8rem 1rem;
+        border-radius: 10px;
+        border: 0;
+      }
+      textarea {
+        min-height: 110px;
+      }
+      form .btn {
+        border: 0;
+        cursor: pointer;
+        justify-self: start;
+      }
+
+      /* Footer */
+      footer {
+        padding: 48px 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      footer .wrap {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 860px) {
+        nav {
+          display: none;
+        }
+        .hero .wrap,
+        .contact .wrap,
+        .quotes {
+          grid-template-columns: 1fr;
+        }
+        .cards,
+        .stats .wrap {
+          grid-template-columns: 1fr 1fr;
+        }
+        .contact .wrap {
+          padding: 32px;
+        }
+      }
+      @media (max-width: 560px) {
+        .cards,
+        .stats .wrap {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <a class="logo" href="#"><span></span>Alder Physio</a>
+        <nav>
+          <ul>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#cases">Results</a></li>
+            <li><a href="#journal">Journal</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+        <a class="btn" href="#contact">Book a visit</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="wrap">
+        <div>
+          <div class="eyebrow">Physiotherapy in Lisbon</div>
+          <h1>Move without pain again.</h1>
+          <p class="lead">
+            Hands-on treatment and a plan you can follow at home, for back and neck pain, sports injuries and recovery
+            after surgery.
+          </p>
+          <div class="actions">
+            <a class="btn" href="#contact">Book a first visit</a>
+            <a class="btn outline" href="#services">See treatments</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <strong>4.9</strong>
+          <div>average rating from 1,200 patients</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="wrap">
+        <div><strong>12 years</strong><span>helping people move</span></div>
+        <div><strong>6 therapists</strong><span>all fully licensed</span></div>
+        <div><strong>48 hours</strong><span>to your first visit</span></div>
+        <div><strong>3 clinics</strong><span>in the same network</span></div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Treatments</div>
+          <h2>Care that fits how you live</h2>
+          <p>Every plan starts with a full assessment and ends with you moving on your own.</p>
+        </div>
+        <div class="cards">
+          <div class="card">
+            <div class="icon">●</div>
+            <h3>Back and neck pain</h3>
+            <p>Manual therapy and exercises that ease pain and keep it from coming back.</p>
+          </div>
+          <div class="card">
+            <div class="icon">●</div>
+            <h3>Sports injuries</h3>
+            <p>From sprains to strains, a step-by-step return to the sport you love.</p>
+          </div>
+          <div class="card">
+            <div class="icon">●</div>
+            <h3>After surgery</h3>
+            <p>Rebuild strength and range of motion with a plan agreed with your surgeon.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cases" class="muted-bg">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Results</div>
+          <h2>Patients who got moving again</h2>
+        </div>
+        <div class="cards">
+          <div class="case">
+            <div class="cover"></div>
+            <div>
+              <h3>Back to running after a knee injury</h3>
+              <p>Twelve weeks from limping to a 10 km race.</p>
+            </div>
+          </div>
+          <div class="case">
+            <div class="cover"></div>
+            <div>
+              <h3>A desk job without neck pain</h3>
+              <p>Small daily habits that made a big difference.</p>
+            </div>
+          </div>
+          <div class="case">
+            <div class="cover"></div>
+            <div>
+              <h3>Walking with confidence after hip surgery</h3>
+              <p>Strength and balance work, at the clinic and at home.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="journal">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="eyebrow">Journal</div>
+          <h2>Advice from our therapists</h2>
+        </div>
+        <div class="cards">
+          <div class="post">
+            <div class="cover"></div>
+            <div>
+              <h3>Simple desk posture habits</h3>
+              <p>Small changes to how you sit that ease stiffness.</p>
+            </div>
+          </div>
+          <div class="post">
+            <div class="cover"></div>
+            <div>
+              <h3>Five gentle core exercises to start with</h3>
+              <p>A safe routine for the first weeks.</p>
+            </div>
+          </div>
+          <div class="post">
+            <div class="cover"></div>
+            <div>
+              <h3>Staying hydrated: easy ways to drink more water</h3>
+              <p>Habits that stick through a busy day.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="muted-bg">
+      <div class="wrap quotes">
+        <blockquote>
+          “After two years of back pain I finally have a routine that works, and I understand why.”
+          <cite>Marta, office manager</cite>
+        </blockquote>
+        <blockquote>
+          “They got me back on the pitch three weeks earlier than I expected, without cutting corners.”
+          <cite>João, amateur footballer</cite>
+        </blockquote>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap" style="max-width: 820px">
+        <div class="section-head">
+          <div class="eyebrow">Questions</div>
+          <h2>Before your first visit</h2>
+        </div>
+        <details open>
+          <summary>Do I need a referral?</summary>
+          <p>No. You can book directly; bring any scans or notes you already have.</p>
+        </details>
+        <details>
+          <summary>How long is a session?</summary>
+          <p>The first assessment takes 60 minutes, follow-up sessions 45 minutes.</p>
+        </details>
+        <details>
+          <summary>What should I wear?</summary>
+          <p>Comfortable clothes you can move in. We have changing rooms.</p>
+        </details>
+      </div>
+    </section>
+
+    <section id="contact" class="contact">
+      <div class="wrap">
+        <div>
+          <h2>Book a visit</h2>
+          <p>Tell us what is bothering you and when you are free. We answer within one working day.</p>
+          <p>Rua das Flores 12, Lisbon · Mon–Fri 8:00–20:00</p>
+        </div>
+        <form>
+          <input placeholder="Your name" />
+          <input placeholder="Email or phone" />
+          <textarea placeholder="What would you like help with?"></textarea>
+          <button class="btn" type="submit">Send request</button>
+        </form>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <div>© 2026 Alder Physio. A fictional clinic in the PressFleet demo network.</div>
+        <div>Privacy · Terms</div>
+      </div>
+    </footer>
+  </body>
+</html>

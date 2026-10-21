@@ -63,17 +63,22 @@ class Seo {
 	}
 
 	/**
-	 * Without an SEO plugin, prints the description and sets the document title on single posts.
+	 * Without an SEO plugin: sets the document title of single posts and prints a meta description on singular
+	 * pages, the front page and the posts page.
 	 */
 	public static function register_output(): void {
 		add_action(
 			'wp',
 			static function (): void {
-				if ( null !== self::active_plugin() || ! is_singular() ) {
+				if ( null !== self::active_plugin() ) {
 					return;
 				}
-				add_filter( 'pre_get_document_title', array( self::class, 'document_title' ) );
-				add_action( 'wp_head', array( self::class, 'print_description' ), 1 );
+				if ( is_singular() ) {
+					add_filter( 'pre_get_document_title', array( self::class, 'document_title' ) );
+				}
+				if ( is_singular() || is_front_page() || is_home() ) {
+					add_action( 'wp_head', array( self::class, 'print_description' ), 1 );
+				}
 			}
 		);
 	}
@@ -92,9 +97,21 @@ class Seo {
 	 * Prints the meta description tag.
 	 */
 	public static function print_description(): void {
-		$description = (string) get_post_meta( (int) get_queried_object_id(), self::DESCRIPTION_META, true );
+		$description = self::description();
 		if ( '' !== $description ) {
 			printf( '<meta name="description" content="%s" />' . "\n", esc_attr( $description ) );
 		}
+	}
+
+	/**
+	 * The hub's SEO description, else the excerpt of a single post, else the site tagline.
+	 */
+	public static function description(): string {
+		if ( is_singular() && ! is_front_page() ) {
+			$post_id = (int) get_queried_object_id();
+			$custom  = (string) get_post_meta( $post_id, self::DESCRIPTION_META, true );
+			return '' !== $custom ? $custom : wp_trim_words( wp_strip_all_tags( get_the_excerpt( $post_id ) ), 30, '…' );
+		}
+		return wp_strip_all_tags( (string) get_bloginfo( 'description' ) );
 	}
 }

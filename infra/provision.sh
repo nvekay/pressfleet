@@ -27,10 +27,9 @@ for i in 1 2 3; do
   fi
   wp rewrite structure '/%postname%/' >/dev/null
   wp plugin activate pressfleet-connector >/dev/null
-  if [ -f ../wp/themes/pressfleet-theme/style.css ]; then
-    wp theme activate pressfleet-theme >/dev/null
-    wp option update pressfleet_style "${STYLES[$((i - 1))]}" >/dev/null
-  fi
+  wp theme activate pressfleet-theme >/dev/null
+  # Brand, pages and case studies (infra/seed-site.php runs inside WordPress)
+  wp eval-file - "${STYLES[$((i - 1))]}" --user=admin < seed-site.php
 
   # One Application Password per site for the hub; recreated on every run so the file stays current
   wp user application-password delete admin --all >/dev/null 2>&1 || true

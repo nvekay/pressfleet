@@ -17,7 +17,9 @@
     "lint": "phpcs",
     "lint:fix": "phpcbf",
     "analyse": "phpstan analyse --memory-limit=1G --no-progress",
-    "test": "phpunit"
+    "test": "phpunit",
+    "lint:theme:fix": "phpcbf --standard=../../themes/pressfleet-theme/phpcs.xml.dist ../../themes/pressfleet-theme",
+    "lint:theme": "phpcs --standard=../../themes/pressfleet-theme/phpcs.xml.dist ../../themes/pressfleet-theme"
   },
   "require-dev": {
     "phpcompatibility/phpcompatibility-wp": "^2.1",
