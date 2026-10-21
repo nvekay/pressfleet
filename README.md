@@ -10,6 +10,14 @@ HTML design, in three brands.
 
 The sites, brands and articles are fictional.
 
+![A campaign with one site taken offline: its posts wait and retry while the other sites finish](docs/screenshots/campaign-outage.png)
+
+| Alder Physio                                     | Birch Dental                                     | Cedar Vision                                     |
+| ------------------------------------------------ | ------------------------------------------------ | ------------------------------------------------ |
+| ![Alder Physio](docs/screenshots/site-alder.png) | ![Birch Dental](docs/screenshots/site-birch.png) | ![Cedar Vision](docs/screenshots/site-cedar.png) |
+
+One block theme, three style variations.
+
 ## How it works
 
 ```mermaid
@@ -51,6 +59,14 @@ Measured on the local Docker setup (three WordPress 7.1 sites, PHP 8.4, one Mari
 | The hub down while a visitor sends a lead          | saved on the site, delivered on the third attempt |
 | Lighthouse, mobile, each demo home page            | 100 / 100 / 100 / 100 (LCP 1.4 s, CLS 0)          |
 
+| The site comes back: everything lands, nothing twice | Preview before publishing                          |
+| ---------------------------------------------------- | -------------------------------------------------- |
+| ![Campaign done](docs/screenshots/campaign-done.png) | ![New campaign](docs/screenshots/new-campaign.png) |
+
+| Sites, checked through the plugin's health endpoint | Leads from every site's form         |
+| --------------------------------------------------- | ------------------------------------ |
+| ![Sites](docs/screenshots/sites.png)                | ![Leads](docs/screenshots/leads.png) |
+
 ## What's in the repository
 
 | Path                                                                 | What it is                                                      |
@@ -90,6 +106,12 @@ Measured on the local Docker setup (three WordPress 7.1 sites, PHP 8.4, one Mari
   fonts and copy. Everything can be edited in the Site Editor without code.
 - Templates for the front page, blog, single posts, pages, archives, search, 404 and case studies. System font stacks, so
   there are no web fonts to download.
+
+<details><summary>The whole Alder Physio home page</summary>
+
+![Alder Physio home page](docs/screenshots/site-alder-full.png)
+
+</details>
 
 ## The public demo
 

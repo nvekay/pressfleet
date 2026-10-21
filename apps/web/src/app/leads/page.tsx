@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: 'Leads' };
 export const dynamic = 'force-dynamic';
 
 export default async function Leads() {
-  const leads = await api.leads();
+  const [leads, config] = await Promise.all([api.leads(), api.config()]);
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <h1 className="text-2xl font-semibold">Leads</h1>
@@ -14,6 +14,12 @@ export default async function Leads() {
         Requests from the Lead form block on every site. Each site saves a request first and forwards it here, signed
         with its secret; if the hub is down, the site retries later, and a resent request is not counted twice.
       </p>
+      {config.demo && (
+        <p className="mt-3 max-w-2xl text-sm text-ink-600">
+          This page is public in the demo, so names, contacts and messages are masked here. Send a request from any
+          demo site&apos;s contact form to see it arrive.
+        </p>
+      )}
       <div className="mt-6 overflow-x-auto rounded-xl border border-ink-200">
         <table className="w-full text-sm">
           <thead className="bg-ink-50 text-left text-xs text-ink-500">

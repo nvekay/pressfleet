@@ -7,6 +7,7 @@ import { env } from '../config/env.js';
 import { type Db, InjectDb } from '../db/db.module.js';
 import { leads, sites } from '../db/schema.js';
 import { SitesService } from '../sites/sites.service.js';
+import { maskContact, maskMessage, maskName } from './mask.js';
 import { notifyTelegram } from './telegram.js';
 
 export interface IncomingLead {
@@ -81,8 +82,9 @@ export class LeadsService {
     }
   }
 
-  list() {
-    return this.db
+  /** Newest first; in the public demo with what visitors typed masked */
+  async list() {
+    const rows = await this.db
       .select({
         id: leads.id,
         site: sites.name,
@@ -100,5 +102,12 @@ export class LeadsService {
       .innerJoin(sites, eq(sites.id, leads.siteId))
       .orderBy(desc(leads.receivedAt))
       .limit(100);
+    if (!env().DEMO_MODE) return rows;
+    return rows.map((r) => ({
+      ...r,
+      name: maskName(r.name),
+      contact: maskContact(r.contact),
+      message: maskMessage(r.message),
+    }));
   }
 }
