@@ -5,6 +5,9 @@ publishes them to every site with retries and no duplicates, and each site runs 
 API, an admin screen, WP-CLI commands and a lead form block. The three demo sites share one block theme, built from an
 HTML design, in three brands.
 
+**[Live demo](https://hub.167-235-242-217.sslip.io)** · demo sites: [Alder Physio](https://alder.167-235-242-217.sslip.io),
+[Birch Dental](https://birch.167-235-242-217.sslip.io), [Cedar Vision](https://cedar.167-235-242-217.sslip.io)
+
 The sites, brands and articles are fictional.
 
 ## How it works
