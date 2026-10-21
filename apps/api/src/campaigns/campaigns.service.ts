@@ -6,7 +6,7 @@ import { type Db, InjectDb } from '../db/db.module.js';
 import { type Campaign, campaigns, deliveries, items, type Site, sites } from '../db/schema.js';
 import { CampaignEvents } from '../publishing/campaign-events.js';
 import { PublishQueues } from '../publishing/publish-queues.js';
-import { publicSite } from '../sites/sites.service.js';
+import { publicSite, SitesService } from '../sites/sites.service.js';
 import { type ImportSource, readImport } from './import-source.js';
 
 const OPEN: DeliveryStatus[] = ['queued', 'publishing', 'retrying'];
@@ -23,6 +23,7 @@ export class CampaignsService {
     @InjectDb() private readonly db: Db,
     private readonly events: CampaignEvents,
     private readonly queues: PublishQueues,
+    private readonly sites: SitesService,
   ) {}
 
   /** Parses the import without creating anything, so the dashboard can show problems first */
@@ -148,7 +149,14 @@ export class CampaignsService {
       .set({ status, finishedAt: new Date() })
       .where(and(eq(campaigns.id, id), eq(campaigns.status, 'running')))
       .returning();
-    if (updated) this.events.emit({ campaignId: id, type: 'campaign', data: { ...updated, counts } });
+    if (!updated) return;
+    this.events.emit({ campaignId: id, type: 'campaign', data: { ...updated, counts } });
+    // Fresh post counts for the dashboard's site cards; a failed check is recorded on the site, not thrown
+    const siteIds = await this.db
+      .selectDistinct({ siteId: deliveries.siteId })
+      .from(deliveries)
+      .where(eq(deliveries.campaignId, id));
+    void Promise.allSettled(siteIds.map((s) => this.sites.check(s.siteId)));
   }
 
   private async countsFor(ids: string[]): Promise<Map<string, Counts>> {

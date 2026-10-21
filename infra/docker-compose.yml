@@ -5,6 +5,9 @@ name: pressfleet
 x-wordpress: &wordpress
   build: ./wordpress
   image: pressfleet-wordpress
+  # Lets the sites reach the dashboard on the host, for sample images
+  extra_hosts:
+    - 'host.docker.internal:host-gateway'
   depends_on:
     mariadb:
       condition: service_healthy
@@ -49,6 +52,7 @@ services:
       - site1:/var/www/html
       - ../wp/plugins/pressfleet-connector:/var/www/html/wp-content/plugins/pressfleet-connector
       - ../wp/themes/pressfleet-theme:/var/www/html/wp-content/themes/pressfleet-theme
+      - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
   site2:
     <<: *wordpress
@@ -60,6 +64,7 @@ services:
       - site2:/var/www/html
       - ../wp/plugins/pressfleet-connector:/var/www/html/wp-content/plugins/pressfleet-connector
       - ../wp/themes/pressfleet-theme:/var/www/html/wp-content/themes/pressfleet-theme
+      - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
   site3:
     <<: *wordpress
@@ -71,6 +76,7 @@ services:
       - site3:/var/www/html
       - ../wp/plugins/pressfleet-connector:/var/www/html/wp-content/plugins/pressfleet-connector
       - ../wp/themes/pressfleet-theme:/var/www/html/wp-content/themes/pressfleet-theme
+      - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
 
   postgres:
     image: postgres:17-alpine
