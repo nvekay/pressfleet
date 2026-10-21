@@ -1,0 +1,31 @@
+{
+  "name": "pressfleet",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.10.1",
+  "description": "Publish to a network of WordPress sites from one hub: CSV or Google Sheets in, a queue with retries, a connector plugin with REST, WP-CLI and a lead form block, and a block theme with three brands",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:wp": "docker compose -f infra/docker-compose.yml up -d --build --wait && bash infra/provision.sh",
+    "down:wp": "docker compose -f infra/docker-compose.yml down",
+    "build": "pnpm -r build",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "php": "node scripts/php.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "prettier": "3.9.9",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.71.1"
+  }
+}

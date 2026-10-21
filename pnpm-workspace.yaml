@@ -1,0 +1,10 @@
+packages:
+  - apps/*
+  - packages/*
+  - wp/plugins/*
+
+allowBuilds:
+  # esbuild (used by tsx, vite and drizzle-kit) checks its platform binary on install
+  esbuild: true
+  # Optional native file locking used by @wordpress/env; it falls back without it
+  fs-ext-extra-prebuilt: false

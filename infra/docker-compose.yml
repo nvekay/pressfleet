@@ -1,0 +1,104 @@
+# Local development: three WordPress sites with the PressFleet plugin and theme mounted from wp/, plus the hub's
+# Postgres and Redis. The hub itself runs on the host (pnpm dev).
+name: pressfleet
+
+x-wordpress: &wordpress
+  build: ./wordpress
+  image: pressfleet-wordpress
+  depends_on:
+    mariadb:
+      condition: service_healthy
+  healthcheck:
+    test: ['CMD-SHELL', 'curl -fsS -o /dev/null http://localhost/wp-includes/images/blank.gif || exit 1']
+    interval: 3s
+    timeout: 3s
+    retries: 40
+
+x-wordpress-env: &wordpress-env
+  WORDPRESS_DB_HOST: mariadb
+  WORDPRESS_DB_USER: pressfleet
+  WORDPRESS_DB_PASSWORD: pressfleet
+  # Application Passwords over plain HTTP are allowed only in a local environment
+  WORDPRESS_CONFIG_EXTRA: |
+    define('WP_ENVIRONMENT_TYPE', 'local');
+    define('WP_DEBUG_LOG', true);
+
+services:
+  mariadb:
+    image: mariadb:11.8
+    environment:
+      MARIADB_ROOT_PASSWORD: pressfleet-root
+      MARIADB_USER: pressfleet
+      MARIADB_PASSWORD: pressfleet
+    volumes:
+      - mariadb:/var/lib/mysql
+      - ./mariadb-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  site1:
+    <<: *wordpress
+    ports: ['8081:80']
+    environment:
+      <<: *wordpress-env
+      WORDPRESS_DB_NAME: site1
+    volumes:
+      - site1:/var/www/html
+      - ../wp/plugins/pressfleet-connector:/var/www/html/wp-content/plugins/pressfleet-connector
+      - ../wp/themes/pressfleet-theme:/var/www/html/wp-content/themes/pressfleet-theme
+
+  site2:
+    <<: *wordpress
+    ports: ['8082:80']
+    environment:
+      <<: *wordpress-env
+      WORDPRESS_DB_NAME: site2
+    volumes:
+      - site2:/var/www/html
+      - ../wp/plugins/pressfleet-connector:/var/www/html/wp-content/plugins/pressfleet-connector
+      - ../wp/themes/pressfleet-theme:/var/www/html/wp-content/themes/pressfleet-theme
+
+  site3:
+    <<: *wordpress
+    ports: ['8083:80']
+    environment:
+      <<: *wordpress-env
+      WORDPRESS_DB_NAME: site3
+    volumes:
+      - site3:/var/www/html
+      - ../wp/plugins/pressfleet-connector:/var/www/html/wp-content/plugins/pressfleet-connector
+      - ../wp/themes/pressfleet-theme:/var/www/html/wp-content/themes/pressfleet-theme
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: pressfleet
+      POSTGRES_PASSWORD: pressfleet
+      POSTGRES_DB: pressfleet
+    ports: ['5435:5432']
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U pressfleet']
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8-alpine
+    ports: ['6380:6379']
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  mariadb:
+  site1:
+  site2:
+  site3:
+  postgres:

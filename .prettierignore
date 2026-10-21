@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+dist
+build
+.next
+next-env.d.ts
+playwright-report
+test-results
+vendor
+# PHP and block sources follow WordPress Coding Standards (PHPCS, wp-scripts)
+wp

@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - pressfleet-connector.php
+        - uninstall.php
+        - includes
+    scanFiles:
+        - tests/stubs/wp-cli.php

@@ -1,0 +1,18 @@
+node_modules/
+dist/
+build/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+.env*
+!.env.example
+*.log
+coverage/
+playwright-report/
+test-results/
+.claude/
+# PHP tooling installed by Composer
+vendor/
+.phpunit.result.cache
+# Local site credentials written by infra/provision.sh
+infra/.sites.json
