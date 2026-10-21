@@ -16,8 +16,8 @@ export default async function Leads() {
       </p>
       {config.demo && (
         <p className="mt-3 max-w-2xl text-sm text-ink-600">
-          This page is public in the demo, so names, contacts and messages are masked here. Send a request from any
-          demo site&apos;s contact form to see it arrive.
+          This page is public in the demo, so names, contacts and messages are masked here. Send a request from any demo
+          site&apos;s contact form to see it arrive.
         </p>
       )}
       <div className="mt-6 overflow-x-auto rounded-xl border border-ink-200">
