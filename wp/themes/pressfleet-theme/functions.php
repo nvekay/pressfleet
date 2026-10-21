@@ -49,3 +49,17 @@ add_action(
 		);
 	}
 );
+
+/*
+ * The home page title uses the brand's short line ("Physiotherapy in Lisbon"); the longer tagline stays in the
+ * meta description.
+ */
+add_filter(
+	'document_title_parts',
+	static function ( array $parts ): array {
+		if ( isset( $parts['tagline'] ) ) {
+			$parts['tagline'] = (string) pressfleet_theme_brand()['eyebrow'];
+		}
+		return $parts;
+	}
+);

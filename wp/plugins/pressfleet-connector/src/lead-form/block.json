@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "pressfleet/lead-form",
+  "version": "0.1.0",
+  "title": "Lead form",
+  "category": "widgets",
+  "icon": "email-alt",
+  "description": "A contact form. Requests are stored on this site and forwarded to the PressFleet hub, with retries if the hub is down.",
+  "keywords": ["contact", "form", "booking", "lead"],
+  "textdomain": "pressfleet-connector",
+  "attributes": {
+    "buttonText": { "type": "string", "default": "Send request" },
+    "successMessage": {
+      "type": "string",
+      "default": "Thank you! We will get back to you within one working day."
+    },
+    "showMessage": { "type": "boolean", "default": true }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"],
+    "color": { "background": true, "text": true },
+    "spacing": { "padding": true, "margin": true },
+    "interactivity": true
+  },
+  "editorScript": "file:./index.js",
+  "style": "file:./style-index.css",
+  "viewScriptModule": "file:./view.js",
+  "render": "file:./render.php"
+}

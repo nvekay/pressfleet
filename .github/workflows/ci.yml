@@ -26,6 +26,7 @@ jobs:
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm lint
+      - run: pnpm --filter @pressfleet/connector lint:js
       - run: pnpm test
       - run: pnpm build
 

@@ -1,0 +1,50 @@
+.pressfleet-lead-form {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.pressfleet-lead-form input,
+.pressfleet-lead-form textarea {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 0.8rem 1rem;
+	border: 1px solid rgb(0 0 0 / 12%);
+	border-radius: 10px;
+	background: #fff;
+	color: #14201a;
+	font: inherit;
+}
+
+.pressfleet-lead-form textarea {
+	min-height: 7rem;
+	resize: vertical;
+}
+
+.pressfleet-lead-form .wp-block-button {
+	justify-self: start;
+}
+
+.pressfleet-lead-form button {
+	border: 0;
+	cursor: pointer;
+}
+
+.pressfleet-lead-form button[disabled] {
+	opacity: 0.7;
+	cursor: progress;
+}
+
+/* Hidden from people; bots fill it in */
+.pressfleet-lead-form .pressfleet-hp {
+	position: absolute;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+.pressfleet-lead-form [role="status"],
+.pressfleet-lead-form [role="alert"] {
+	margin: 0;
+	font-weight: 600;
+}

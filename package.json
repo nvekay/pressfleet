@@ -9,7 +9,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev:wp": "docker compose -f infra/docker-compose.yml up -d --build --wait && bash infra/provision.sh",
+    "dev:wp": "pnpm --filter @pressfleet/connector build && docker compose -f infra/docker-compose.yml up -d --build --wait && bash infra/provision.sh",
     "down:wp": "docker compose -f infra/docker-compose.yml down",
     "build": "pnpm -r --if-present build",
     "lint": "eslint .",

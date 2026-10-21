@@ -80,7 +80,29 @@ export const deliveries = pgTable(
   ],
 );
 
+/** A request from a site's Lead form block; (siteId, wpLeadId) makes a resent lead a no-op */
+export const leads = pgTable(
+  'leads',
+  {
+    id: id(),
+    siteId: text('site_id')
+      .notNull()
+      .references(() => sites.id, { onDelete: 'cascade' }),
+    wpLeadId: integer('wp_lead_id').notNull(),
+    name: text('name').notNull(),
+    contact: text('contact').notNull(),
+    message: text('message').notNull(),
+    page: text('page').notNull(),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }).notNull(),
+    receivedAt: timestamp('received_at', { withTimezone: true }).notNull().defaultNow(),
+    notifiedAt: timestamp('notified_at', { withTimezone: true }),
+    notifyError: text('notify_error'),
+  },
+  (t) => [uniqueIndex('leads_site_lead_idx').on(t.siteId, t.wpLeadId), index('leads_received_idx').on(t.receivedAt)],
+);
+
 export type Site = typeof sites.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;
 export type Item = typeof items.$inferSelect;
 export type Delivery = typeof deliveries.$inferSelect;
+export type Lead = typeof leads.$inferSelect;

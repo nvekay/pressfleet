@@ -70,3 +70,17 @@ export interface ImportPreview {
   problems: { row: number; message: string }[];
   unknownColumns: string[];
 }
+
+export interface Lead {
+  id: string;
+  site: string;
+  siteUrl: string;
+  name: string;
+  contact: string;
+  message: string;
+  page: string;
+  submittedAt: string;
+  receivedAt: string;
+  notifiedAt: string | null;
+  notifyError: string | null;
+}

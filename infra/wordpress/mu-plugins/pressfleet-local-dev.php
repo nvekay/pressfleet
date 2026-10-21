@@ -21,7 +21,8 @@ add_filter(
 	'http_allowed_safe_ports',
 	static function ( $ports, $host ) {
 		if ( 'host.docker.internal' === $host ) {
-			$ports[] = 3000;
+			$ports[] = 3000; // dashboard (sample images)
+			$ports[] = 4000; // hub API (leads)
 		}
 		return $ports;
 	},

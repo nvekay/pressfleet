@@ -31,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <NavLink href="/">Overview</NavLink>
               <NavLink href="/campaigns">Campaigns</NavLink>
               <NavLink href="/sites">Sites</NavLink>
+              <NavLink href="/leads">Leads</NavLink>
               {GITHUB_URL && (
                 <a
                   href={GITHUB_URL}

@@ -10,3 +10,8 @@ allowBuilds:
   fs-ext-extra-prebuilt: false
   # Optional native accelerator for BullMQ's msgpack; works without it
   msgpackr-extract: false
+  # Pulled in by @wordpress/scripts; the block builds without their install scripts
+  '@parcel/watcher': false
+  core-js: false
+  core-js-pure: false
+  unrs-resolver: false

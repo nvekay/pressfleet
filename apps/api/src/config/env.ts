@@ -25,6 +25,11 @@ const schema = z.object({
   RETRY_DELAY_MS: z.coerce.number().int().positive().default(5000),
   RETRY_MAX_DELAY_MS: z.coerce.number().int().positive().default(120_000),
   WP_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  // Path of the public leads endpoint as the sites call it (they sign it); differs behind a proxy prefix
+  LEADS_PUBLIC_PATH: z.string().startsWith('/').default('/leads'),
+  // New leads are posted to this Telegram chat when both are set
+  TELEGRAM_BOT_TOKEN: z.string().optional(),
+  TELEGRAM_CHAT_ID: z.string().optional(),
 });
 
 export type Env = z.infer<typeof schema>;

@@ -28,6 +28,8 @@ for i in 1 2 3; do
   wp rewrite structure '/%postname%/' >/dev/null
   wp plugin activate pressfleet-connector >/dev/null
   wp theme activate pressfleet-theme >/dev/null
+  # Leads from the form block go to the hub API on the host
+  wp option update pressfleet_hub_url "${HUB_LEADS_URL:-http://host.docker.internal:4000/leads}" >/dev/null
   # Brand, pages and case studies (infra/seed-site.php runs inside WordPress)
   wp eval-file - "${STYLES[$((i - 1))]}" --user=admin < seed-site.php
 

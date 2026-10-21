@@ -1,6 +1,6 @@
 import 'server-only';
 import { env } from './env';
-import type { CampaignDetail, CampaignSummary, ImportPreview, Site } from './types';
+import type { CampaignDetail, CampaignSummary, ImportPreview, Lead, Site } from './types';
 
 export class ApiError extends Error {
   constructor(
@@ -43,4 +43,5 @@ export const api = {
   createCampaign: (input: ImportSource & { name: string; siteIds: string[] }) =>
     call<{ id: string }>('/campaigns', { method: 'POST', body: input }),
   retryFailed: (id: string) => call<{ queued: number }>(`/campaigns/${id}/retry-failed`, { method: 'POST' }),
+  leads: () => call<Lead[]>('/leads'),
 };

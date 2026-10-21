@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Installer {
 
-	const DB_VERSION        = 1;
+	const DB_VERSION        = 2;
 	const DB_VERSION_OPTION = 'pressfleet_db_version';
 
 	/**
@@ -37,7 +37,7 @@ final class Installer {
 	}
 
 	/**
-	 * Creates or updates the log table (dbDelta only adds what is missing).
+	 * Creates or updates the plugin's tables (dbDelta only adds what is missing).
 	 */
 	private static function install(): void {
 		global $wpdb;
@@ -58,6 +58,23 @@ final class Installer {
 				PRIMARY KEY  (id),
 				KEY created_at (created_at),
 				KEY external_id (external_id)
+			) {$charset};"
+		);
+		$leads = Leads::table();
+		dbDelta(
+			"CREATE TABLE {$leads} (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				created_at datetime NOT NULL,
+				name varchar(100) NOT NULL,
+				contact varchar(120) NOT NULL,
+				message text NOT NULL,
+				page varchar(255) NOT NULL DEFAULT '',
+				status varchar(10) NOT NULL DEFAULT 'pending',
+				attempts tinyint(3) unsigned NOT NULL DEFAULT 0,
+				last_error text NULL,
+				sent_at datetime NULL,
+				PRIMARY KEY  (id),
+				KEY status (status)
 			) {$charset};"
 		);
 		update_option( self::DB_VERSION_OPTION, self::DB_VERSION, false );

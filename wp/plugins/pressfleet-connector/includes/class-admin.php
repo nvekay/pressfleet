@@ -23,6 +23,7 @@ final class Admin {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
 		add_action( 'admin_init', array( $this, 'settings' ) );
 		add_action( 'admin_post_pressfleet_regenerate_secret', array( $this, 'regenerate_secret' ) );
+		add_action( 'admin_post_pressfleet_retry_leads', array( $this, 'retry_leads' ) );
 	}
 
 	/**
@@ -36,6 +37,64 @@ final class Admin {
 			self::PAGE,
 			array( $this, 'render' )
 		);
+		add_menu_page(
+			__( 'Leads', 'pressfleet-connector' ),
+			__( 'Leads', 'pressfleet-connector' ),
+			'edit_pages',
+			'pressfleet-leads',
+			array( $this, 'render_leads' ),
+			'dashicons-email-alt',
+			26
+		);
+	}
+
+	/**
+	 * Sends every unsent lead now (admin-post action with a nonce).
+	 */
+	public function retry_leads(): void {
+		if ( ! current_user_can( 'edit_pages' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do this.', 'pressfleet-connector' ), 403 );
+		}
+		check_admin_referer( 'pressfleet_retry_leads' );
+		$sent = 0;
+		foreach ( Leads::unsent_ids() as $id ) {
+			$sent += Lead_Sender::send( $id ) ? 1 : 0;
+		}
+		wp_safe_redirect( add_query_arg( 'sent', $sent, menu_page_url( 'pressfleet-leads', false ) ) );
+		exit;
+	}
+
+	/**
+	 * The leads page.
+	 */
+	public function render_leads(): void {
+		if ( ! current_user_can( 'edit_pages' ) ) {
+			return;
+		}
+		$table = new Leads_Table();
+		$table->prepare_items();
+		$unsent = count( Leads::unsent_ids() );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display only
+		$sent = isset( $_GET['sent'] ) ? absint( $_GET['sent'] ) : null;
+		?>
+		<div class="wrap">
+			<h1 class="wp-heading-inline"><?php esc_html_e( 'Leads', 'pressfleet-connector' ); ?></h1>
+			<?php if ( $unsent && '' !== Settings::hub_url() ) : ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+					<input type="hidden" name="action" value="pressfleet_retry_leads" />
+					<?php wp_nonce_field( 'pressfleet_retry_leads' ); ?>
+					<?php /* translators: %d: number of leads not sent yet */ ?>
+					<?php submit_button( sprintf( _n( 'Send %d waiting lead now', 'Send %d waiting leads now', $unsent, 'pressfleet-connector' ), $unsent ), 'page-title-action', 'submit', false ); ?>
+				</form>
+			<?php endif; ?>
+			<?php if ( null !== $sent ) : ?>
+				<?php /* translators: %d: number of leads sent */ ?>
+				<div class="notice notice-info"><p><?php echo esc_html( sprintf( _n( '%d lead sent.', '%d leads sent.', $sent, 'pressfleet-connector' ), $sent ) ); ?></p></div>
+			<?php endif; ?>
+			<p><?php esc_html_e( 'Every lead is saved here first and then forwarded to the hub, with retries after 1, 5 and 30 minutes, 2 and 12 hours.', 'pressfleet-connector' ); ?></p>
+			<?php $table->display(); ?>
+		</div>
+		<?php
 	}
 
 	/**

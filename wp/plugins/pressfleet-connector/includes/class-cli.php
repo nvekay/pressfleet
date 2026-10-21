@@ -49,6 +49,10 @@ final class Cli {
 				'value' => '' !== Settings::secret() ? 'set' : 'missing',
 			),
 			array(
+				'key'   => 'Leads sent / waiting / failed',
+				'value' => sprintf( '%d / %d / %d', Leads::count( 'sent' ), Leads::count( 'pending' ), Leads::count( 'failed' ) ),
+			),
+			array(
 				'key'   => 'SEO fields go to',
 				'value' => Seo::active_plugin() ?? 'this plugin',
 			),
@@ -124,6 +128,68 @@ final class Cli {
 		Settings::ensure_secret();
 		WP_CLI::line( Settings::secret() );
 	}
+
+	/**
+	 * Lists leads from the Lead form block.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--status=<status>]
+	 * : pending, sent, failed or stored.
+	 *
+	 * [--limit=<number>]
+	 * : How many.
+	 * ---
+	 * default: 20
+	 * ---
+	 *
+	 * [--format=<format>]
+	 * : table, csv, json or yaml.
+	 * ---
+	 * default: table
+	 * ---
+	 *
+	 * @param string[]              $args       Positional arguments.
+	 * @param array<string, string> $assoc_args Named arguments.
+	 */
+	public function leads( array $args, array $assoc_args ): void {
+		$items = array_map(
+			static fn( $lead ) => array(
+				'id'       => $lead->id,
+				'time'     => $lead->created_at,
+				'name'     => $lead->name,
+				'contact'  => $lead->contact,
+				'status'   => $lead->status,
+				'attempts' => $lead->attempts,
+				'error'    => (string) $lead->last_error,
+			),
+			Leads::latest( (int) ( $assoc_args['limit'] ?? 20 ), 0, (string) ( $assoc_args['status'] ?? '' ) )
+		);
+		WP_CLI\Utils\format_items( $assoc_args['format'] ?? 'table', $items, array( 'id', 'time', 'name', 'contact', 'status', 'attempts', 'error' ) );
+	}
+
+	// phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter -- WP-CLI passes both arguments to every command.
+
+	/**
+	 * Sends every pending or failed lead to the hub now.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp pressfleet retry
+	 *
+	 * @param string[]              $args       Positional arguments.
+	 * @param array<string, string> $assoc_args Named arguments.
+	 */
+	public function retry( array $args, array $assoc_args ): void {
+		$ids  = Leads::unsent_ids();
+		$sent = 0;
+		foreach ( $ids as $id ) {
+			$sent += Lead_Sender::send( $id ) ? 1 : 0;
+		}
+		WP_CLI::line( sprintf( 'Sent %d of %d leads.', $sent, count( $ids ) ) );
+	}
+
+	// phpcs:enable
 
 	/**
 	 * Count of posts the hub created.

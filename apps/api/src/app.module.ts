@@ -6,6 +6,8 @@ import { InternalKeyGuard } from './common/internal-key.guard.js';
 import { SecretBoxModule } from './common/secret-box.module.js';
 import { DbModule } from './db/db.module.js';
 import { HealthController } from './health/health.controller.js';
+import { LeadsController } from './leads/leads.controller.js';
+import { LeadsService } from './leads/leads.service.js';
 import { CampaignEvents } from './publishing/campaign-events.js';
 import { DeliveryRunner } from './publishing/delivery-runner.js';
 import { PublishQueues } from './publishing/publish-queues.js';
@@ -15,9 +17,10 @@ import { SitesService } from './sites/sites.service.js';
 
 @Module({
   imports: [DbModule, SecretBoxModule],
-  controllers: [HealthController, SitesController, CampaignsController, QueueController],
+  controllers: [HealthController, SitesController, CampaignsController, QueueController, LeadsController],
   providers: [
     SitesService,
+    LeadsService,
     CampaignsService,
     CampaignEvents,
     DeliveryRunner,
